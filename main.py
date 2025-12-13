@@ -2,7 +2,7 @@ from camera.camera import CameraThread
 from inferencia.yolo_inference import YoloInference
 from comm.udp_sender import UDPSender
 import config
-
+import cv2
 
 def main():
     # Inicia a câmera
@@ -36,11 +36,19 @@ def main():
                 continue
 
             # Preprocessa o frame
-            yolo.preprocess(frame)
+            boxes, scores, smoothed_infer_fps = yolo.predict(frame)
 
             # Atualiza o frame a ser enviado via UDP
             udp_sender.update_frame(frame)
 
+            #/////////////////////////////////////////////////////////////////////
+            # cv2.putText(frame, f"FPS: {smoothed_infer_fps:.2f}", (10, 30),
+            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+            # cv2.imshow("Frame", frame)
+            # if cv2.waitKey(1) & 0xFF == ord('q'):
+            #     break
+            #/////////////////////////////////////////////////////////////////////
+                    # ainda nãi finalizado usar camera para debug no PC
     except KeyboardInterrupt:
         pass
     finally:
