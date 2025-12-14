@@ -1,32 +1,17 @@
 from camera.camera import CameraThread
 from inferencia.yolo_inference import YoloInference
 from comm.udp_sender import UDPSender
-import config
 import cv2
 
+CLASSES = ['faixa-central']
+
 def main():
-    # Inicia a câmera
-    camera = CameraThread(
-        cam_id=config.CAM_ID,
-        width=config.CAP_WIDTH,
-        height=config.CAP_HEIGHT
-    ).start()
 
-    # Inicia o modelo de inferência
-    yolo = YoloInference(
-        model_path=config.MODEL_PATH,
-        num_threads=config.NUM_THREADS,
-        score_th=config.SCORE_TH,
-        nms_iou=config.NMS_IOU,
-        top_k=config.TOP_K
-    )
+    camera = CameraThread().start()
 
-    # Inicia o transmissor UDP
-    udp_sender = UDPSender(
-        ip=config.UDP_IP_PC,
-        port=config.UDP_PORT,
-        jpeg_quality=config.JPEG_QUALITY
-    )
+    yolo = YoloInference()
+    
+    udp_sender = UDPSender()
     udp_sender.start()
 
     try:
@@ -35,25 +20,56 @@ def main():
             if frame is None:
                 continue
 
-            # Preprocessa o frame
-            boxes, scores, smoothed_infer_fps = yolo.predict(frame)
+            detections = yolo.predict(frame)
 
-            # Atualiza o frame a ser enviado via UDP
+            boxes = detections["boxes"]
+            scores = detections["scores"]
+            classes = detections["classes"]
+
+            for box, score, cls in zip(boxes, scores, classes):
+                x1, y1, x2, y2 = map(int, box)
+
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(
+                    frame,
+                    f"{CLASSES[cls]} {score:.2f}",
+                    (x1, y1 - 5),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.5,
+                    (255, 255, 255),
+                    1
+                )
+
+                print(
+                    f"Classe: {cls} | "
+                    f"Score: {score:.2f} | "
+                    f"Box: ({x1},{y1})-({x2},{y2})"
+                )
+
+            if yolo.infer_fps is not None:
+                cv2.putText(
+                    frame,
+                    f"Infer FPS: {yolo.infer_fps:.1f}",
+                    (10, 25),
+                    cv2.FONT_HERSHEY_SIMPLEX,
+                    0.6,
+                    (0, 255, 255),
+                    2
+                )
+
             udp_sender.update_frame(frame)
 
-            #/////////////////////////////////////////////////////////////////////
-            # cv2.putText(frame, f"FPS: {smoothed_infer_fps:.2f}", (10, 30),
-            #             cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
-            # cv2.imshow("Frame", frame)
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
-            #/////////////////////////////////////////////////////////////////////
-                    # ainda nãi finalizado usar camera para debug no PC
+            cv2.imshow("Frame", frame)
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                break
+
     except KeyboardInterrupt:
         pass
     finally:
         camera.stop()
-        udp_sender.stop()   
+        udp_sender.stop()
+        cv2.destroyAllWindows()
+
 
 if __name__ == "__main__":
     main()

@@ -4,8 +4,14 @@ import cv2
 import threading
 from time import sleep
 
+UDP_IP_PC = "192.168.3.58"
+UDP_IP_ENVIO = "0.0.0.0"
+UDP_PORT = 9999
+JPEG_QUALITY = 80
+
+
 class UDPSender:
-    def __init__(self, ip, port, jpeg_quality):
+    def __init__(self, ip= UDP_IP_PC, port = UDP_PORT, jpeg_quality = JPEG_QUALITY):
         self.ip = ip
         self.port = port
         self.jpeg_quality = jpeg_quality
