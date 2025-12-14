@@ -30,32 +30,12 @@ def main():
                 x1, y1, x2, y2 = map(int, box)
 
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                cv2.putText(
-                    frame,
-                    f"{CLASSES[cls]} {score:.2f}",
-                    (x1, y1 - 5),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.5,
-                    (255, 255, 255),
-                    1
-                )
+                cv2.putText(frame,f"{CLASSES[cls]} {score:.2f}",(x1, y1 - 5),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255, 255, 255),1)
 
-                print(
-                    f"Classe: {cls} | "
-                    f"Score: {score:.2f} | "
-                    f"Box: ({x1},{y1})-({x2},{y2})"
-                )
+                print(f"Classe: {cls} | "f"Score: {score:.2f} | "f"Box: ({x1},{y1})-({x2},{y2})")
 
             if yolo.infer_fps is not None:
-                cv2.putText(
-                    frame,
-                    f"Infer FPS: {yolo.infer_fps:.1f}",
-                    (10, 25),
-                    cv2.FONT_HERSHEY_SIMPLEX,
-                    0.6,
-                    (0, 255, 255),
-                    2
-                )
+                cv2.putText(frame,f"Infer FPS: {yolo.infer_fps:.1f}",(10, 25),cv2.FONT_HERSHEY_SIMPLEX,0.6,(0, 255, 255),2)
 
             udp_sender.update_frame(frame)
 
