@@ -2,6 +2,7 @@ from camera.camera import CameraThread
 from inferencia.yolo_inference import YoloInference
 from comm.udp_sender import UDPSender
 import cv2
+import time
 
 CLASSES = ['faixa-central']
 
@@ -42,7 +43,7 @@ def main():
             cv2.imshow("Frame", frame)
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-
+            
     except KeyboardInterrupt:
         pass
     finally:
