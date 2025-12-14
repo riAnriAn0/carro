@@ -2,8 +2,7 @@ import time
 import numpy as np
 import tflite_runtime.interpreter as tflite
 
-MODEL_PATH = "./modelo/yolo-tf.tflite"
-
+MODEL_PATH = "./modelo/yolo-tf.tflite" # modelo integer quantizado
 SCORE_TH = 0.5
 NMS_IOU = 0.45
 TOP_K = 200

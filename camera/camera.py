@@ -2,7 +2,7 @@ import cv2
 import threading
 from time import sleep
 
-CAM_ID = "./video/video.mp4"
+CAM_ID = 2
 CAP_WIDTH, CAP_HEIGHT = 160, 160
 NUM_THREADS = 4
 
